@@ -103,3 +103,11 @@ Use tools like Postman or curl to test the API endpoints. Example curl command t
 curl -X GET https://localhost:5057/api/insurancepolicies
 
 ```
+
+
+## Contributors
+
+- Kushal Singh
+- Mukul Sharma
+- Sidharth Nair
+- Roshankumar Pokal
