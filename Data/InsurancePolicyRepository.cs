@@ -85,12 +85,31 @@ namespace InsurancePoliciesCRUDApp.Data
             return policy;
         }
 
-        public void AddPolicy(InsurancePolicy policy)
+        //public void AddPolicy(InsurancePolicy policy)
+        //{
+        //    using (var conn = new SqlConnection(_connectionString)) // Corrected this line
+        //    {
+        //        string sql = "INSERT INTO InsurancePolicies (PolicyNumber, PolicyHolderName, StartDate, EndDate, Type, PremiumAmount) VALUES (@PolicyNumber, @PolicyHolderName, @StartDate, @EndDate, @Type, @PremiumAmount)";
+        //        using (var cmd = new SqlCommand(sql, conn)) // Corrected this line
+        //        {
+        //            cmd.Parameters.AddWithValue("@PolicyNumber", policy.PolicyNumber);
+        //            cmd.Parameters.AddWithValue("@PolicyHolderName", policy.PolicyHolderName);
+        //            cmd.Parameters.AddWithValue("@StartDate", policy.StartDate);
+        //            cmd.Parameters.AddWithValue("@EndDate", policy.EndDate);
+        //            cmd.Parameters.AddWithValue("@Type", policy.Type);
+        //            cmd.Parameters.AddWithValue("@PremiumAmount", policy.PremiumAmount);
+        //            conn.Open();
+
+        //            cmd.ExecuteNonQuery();
+        //        }
+        //    }
+        //}
+        public async Task AddPolicyAsync(InsurancePolicy policy)
         {
-            using (var conn = new SqlConnection(_connectionString)) // Corrected this line
+            using (var conn = new SqlConnection(_connectionString))
             {
-                string sql = "INSERT INTO InsurancePolicies (PolicyNumber, PolicyHolderName, StartDate, EndDate, Type, PremiumAmount) VALUES (@PolicyNumber, @PolicyHolderName, @StartDate, @EndDate, @Type, @PremiumAmount)";
-                using (var cmd = new SqlCommand(sql, conn)) // Corrected this line
+                string sql = "INSERT INTO InsurancePolicies (PolicyNumber, PolicyHolderName, StartDate, EndDate, Type, PremiumAmount) OUTPUT INSERTED.Id VALUES (@PolicyNumber, @PolicyHolderName, @StartDate, @EndDate, @Type, @PremiumAmount)";
+                using (var cmd = new SqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@PolicyNumber", policy.PolicyNumber);
                     cmd.Parameters.AddWithValue("@PolicyHolderName", policy.PolicyHolderName);
@@ -98,9 +117,8 @@ namespace InsurancePoliciesCRUDApp.Data
                     cmd.Parameters.AddWithValue("@EndDate", policy.EndDate);
                     cmd.Parameters.AddWithValue("@Type", policy.Type);
                     cmd.Parameters.AddWithValue("@PremiumAmount", policy.PremiumAmount);
-                    conn.Open();
-
-                    cmd.ExecuteNonQuery();
+                    await conn.OpenAsync();
+                    policy.Id = (int)await cmd.ExecuteScalarAsync();
                 }
             }
         }

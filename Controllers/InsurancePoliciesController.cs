@@ -28,7 +28,7 @@ namespace InsurancePoliciesCRUDApp.Controllers  // Ensure this matches your actu
         public ActionResult<InsurancePolicy> GetPolicy(int id)
         {
             var policy = _policyRepository.GetPolicyById(id);
-
+            
             if (policy == null)
             {
                 return NotFound();
@@ -37,13 +37,34 @@ namespace InsurancePoliciesCRUDApp.Controllers  // Ensure this matches your actu
             return policy;
         }
 
-        // POST: api/insurancepolicies
+        //// POST: api/insurancepolicies
+        //[HttpPost]
+        //public IActionResult PostPolicy(InsurancePolicy policy)
+        //{
+        //    _policyRepository.AddPolicy(policy);
+        //    return CreatedAtAction(nameof(GetPolicy), new { id = policy.Id }, policy);
+        //}
+
         [HttpPost]
-        public IActionResult PostPolicy(InsurancePolicy policy)
+        public async Task<IActionResult> PostPolicy([FromBody] InsurancePolicy policy)
         {
-            _policyRepository.AddPolicy(policy);
-            return CreatedAtAction(nameof(GetPolicy), new { id = policy.Id }, policy);
+            if (policy == null)
+            {
+                return BadRequest("Policy is null.");
+            }
+
+            try
+            {
+                await _policyRepository.AddPolicyAsync(policy);
+                return CreatedAtAction(nameof(GetPolicy), new { id = policy.Id }, policy);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (ex) here if you have a logging mechanism
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
+
 
         // PUT: api/insurancepolicies/5
         [HttpPut("{id}")]
